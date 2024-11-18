@@ -20,13 +20,16 @@ public class Task {
     private Long id;
 
     @Column(name="title", nullable=false)
-    private String name;
+    private String title;
 
     @Column(name="description")
     private String description;
 
     @Column(name="deadline")
     private Timestamp deadline;
+
+    @Column(name="status", nullable=false)
+    private String status;
 
     @Column(name="projectid", nullable=false, insertable=false, updatable=false)
     private Long projectid;

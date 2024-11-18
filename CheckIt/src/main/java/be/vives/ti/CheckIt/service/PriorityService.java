@@ -15,4 +15,12 @@ public class PriorityService {
     public List<Priority> getAllPriorities() {
         return priorityRepository.findAll();
     }
+
+    public List<Priority> findByStandardpriorityIsTrue() {
+        return priorityRepository.findByStandardpriorityIsTrue();
+    }
+
+    public List<Priority> findByStandardpriorityIsFalse() {
+        return priorityRepository.findByStandardpriorityIsFalse();
+    }
 }
