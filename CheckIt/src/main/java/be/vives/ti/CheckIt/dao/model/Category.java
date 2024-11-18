@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="project")
-public class Project {
+@Table(name="category")
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,4 +22,7 @@ public class Project {
 
     @Column(name="description")
     private String description;
+
+    @Column(name="color", nullable=false)
+    private String color;
 }

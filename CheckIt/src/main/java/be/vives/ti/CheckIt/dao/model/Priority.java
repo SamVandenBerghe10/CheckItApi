@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="project")
-public class Project {
+@Table(name="priority")
+public class Priority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,4 +22,10 @@ public class Project {
 
     @Column(name="description")
     private String description;
+
+    @Column(name="sequence")
+    private String sequence;
+
+    @Column(name="standardpriority", nullable=false)
+    private String standardpriority;
 }

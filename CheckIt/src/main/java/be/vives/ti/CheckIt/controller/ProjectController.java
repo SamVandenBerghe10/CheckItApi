@@ -14,7 +14,7 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
-    @GetMapping("/")
+    @GetMapping("/projects")
     public List<Project> getAllProjects() {
         return projectService.getAllProjects();
     }
