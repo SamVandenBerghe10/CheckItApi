@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Data
@@ -31,17 +32,8 @@ public class Task {
     @Column(name="status", nullable=false)
     private String status;
 
-    @Column(name="projectid", nullable=false, insertable=false, updatable=false)
-    private Long projectid;
-
-    @Column(name="categoryid", insertable=false, updatable=false)
-    private Long categoryid;
-
-    @Column(name="priorityid", nullable=false, insertable=false, updatable=false)
-    private Long priorityid;
-
-    @Column(name="parenttaskid", insertable=false, updatable=false)
-    private Long parenttaskid;
+    @Column(name="parenttaskid")
+    private Integer parenttaskid;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="projectid")
@@ -55,7 +47,7 @@ public class Task {
     @JoinColumn(name="priorityid")
     private Priority priority;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="parenttaskid")
-    private Task parentTask;
+    private List<Task> childtasks;
 }

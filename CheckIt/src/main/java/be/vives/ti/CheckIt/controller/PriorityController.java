@@ -1,12 +1,10 @@
 package be.vives.ti.CheckIt.controller;
 
 import be.vives.ti.CheckIt.dao.model.Priority;
+import be.vives.ti.CheckIt.dao.model.Task;
 import be.vives.ti.CheckIt.service.PriorityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,6 +19,11 @@ public class PriorityController {
     @GetMapping
     public List<Priority> getAllPriorities() {
         return priorityService.getAllPriorities();
+    }
+
+    @GetMapping("/{id}")
+    public Priority getTaskById(@PathVariable int id) {
+        return priorityService.getPriorityById(id).orElse(null);
     }
 
     @GetMapping("/standard")

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -13,10 +14,18 @@ public class TaskService {
     private TaskRepository taskRepository;
 
     public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+        return taskRepository.findByParenttaskidIsNull();
+    }
+
+    public Optional<Task> getTaskById(int id) {
+        return taskRepository.findById(id);
     }
 
     public List<Task> getTaskByProjectId(Long projectId) {
         return taskRepository.findByProjectId(projectId);
+    }
+
+    public Task saveTask(Task task) {
+        return taskRepository.save(task);
     }
 }
