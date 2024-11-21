@@ -22,17 +22,12 @@ public class PriorityController {
     }
 
     @GetMapping("/{id}")
-    public Priority getTaskById(@PathVariable int id) {
+    public Priority getPriorityById(@PathVariable int id) {
         return priorityService.getPriorityById(id).orElse(null);
     }
 
-    @GetMapping("/standard")
-    public List<Priority> findByStandardpriorityIsTrue() {
-        return priorityService.findByStandardpriorityIsTrue();
-    }
-
-    @GetMapping("/notstandard")
-    public List<Priority> findByStandardpriorityIsFalse() {
-        return priorityService.findByStandardpriorityIsFalse();
+    @GetMapping("/sorted")
+    public List<Priority> getAllPrioritySorted() {
+        return priorityService.getAllPrioritySorted();
     }
 }

@@ -25,6 +25,10 @@ public class TaskService {
         return taskRepository.findByProjectId(projectId);
     }
 
+    public List<Task> getTaskByCategoryId(Long projectId) {
+        return taskRepository.findByCategoryId(projectId);
+    }
+
     public Task saveTask(Task task) {
         return taskRepository.save(task);
     }

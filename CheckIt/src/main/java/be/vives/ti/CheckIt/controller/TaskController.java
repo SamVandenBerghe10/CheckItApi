@@ -35,6 +35,8 @@ public class TaskController {
     @Autowired
     private PriorityService priorityService;
 
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     @GetMapping
     public List<Task> getAllTasks() {
         return taskService.getAllTasks();
@@ -50,12 +52,54 @@ public class TaskController {
         return taskService.getTaskByProjectId((long) id);
     }
 
+    @GetMapping("/category/{id}")
+    public List<Task> getTaskByCategoryId(@PathVariable Integer id) {
+        return taskService.getTaskByCategoryId((long) id);
+    }
+
+    @PostMapping("/update/{id}")
+    public ResponseEntity<Task> updateTask(@Valid @RequestBody TaskRequest taskRequest, @PathVariable int id) throws ParseException {
+        Task task = getTaskById(id);
+        if(task != null)
+        {
+            task.setId((long)id);
+            task.setTitle(taskRequest.title());
+            task.setDescription(taskRequest.description());
+            task.setDeadline(new Timestamp(dateFormat.parse(taskRequest.deadline()).getTime()));
+            task.setStatus(taskRequest.status());
+
+            if (taskRequest.categoryid() != null) {
+                Category category = categoryService.getCategoryById(taskRequest.categoryid()) // Service or repository call
+                        .orElseThrow(() -> new RuntimeException("Category not found"));
+                task.setCategory(category);
+            }
+
+            if (taskRequest.projectid() != null) {
+                Project project = projectService.getProjectById(taskRequest.projectid())
+                        .orElseThrow(() -> new RuntimeException("Project not found"));
+                task.setProject(project);
+            }
+
+            if (taskRequest.priorityid() != null) {
+                Priority priority = priorityService.getPriorityById(taskRequest.priorityid())
+                        .orElseThrow(() -> new RuntimeException("Priority not found"));
+                task.setPriority(priority);
+            }
+            task.setParenttaskid(taskRequest.parenttaskid());
+
+            Task updatedTask = taskService.saveTask(task);
+            return ResponseEntity.ok(updatedTask);
+        }
+        else {
+            throw new RuntimeException("Task not found");
+        }
+    }
+
     @PostMapping("/add")
     public ResponseEntity<Task> createTask(@Valid @RequestBody TaskRequest taskRequest) throws ParseException {
         Task task = new Task();
         task.setTitle(taskRequest.title());
         task.setDescription(taskRequest.description());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         task.setDeadline(new Timestamp(dateFormat.parse(taskRequest.deadline()).getTime()));
         task.setStatus(taskRequest.status());
 
