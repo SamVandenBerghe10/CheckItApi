@@ -1,14 +1,12 @@
 package be.vives.ti.CheckIt.controller;
 
 import be.vives.ti.CheckIt.dao.model.Priority;
-import be.vives.ti.CheckIt.dao.model.Task;
 import be.vives.ti.CheckIt.service.PriorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:8081")
 @RestController
 @RequestMapping("/priorities")
 public class PriorityController {

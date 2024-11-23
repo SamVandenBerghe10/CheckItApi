@@ -2,7 +2,6 @@ package be.vives.ti.CheckIt.controller;
 
 import be.vives.ti.CheckIt.controller.request.CategoryRequest;
 import be.vives.ti.CheckIt.dao.model.Category;
-import be.vives.ti.CheckIt.dao.model.Project;
 import be.vives.ti.CheckIt.dao.model.Task;
 import be.vives.ti.CheckIt.service.CategoryService;
 import be.vives.ti.CheckIt.service.TaskService;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:8081")
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
@@ -43,7 +41,7 @@ public class CategoryController {
         return ResponseEntity.ok(savedCategory);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity deleteCategory(@PathVariable int id) {
         List<Task> taskList = taskService.getTaskByCategoryId((long)id);
         for (Task task : taskList) {

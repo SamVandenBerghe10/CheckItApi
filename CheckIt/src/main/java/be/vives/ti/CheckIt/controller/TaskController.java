@@ -17,11 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:8081")
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
@@ -57,7 +54,7 @@ public class TaskController {
         return taskService.getTaskByCategoryId((long) id);
     }
 
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Task> updateTask(@Valid @RequestBody TaskRequest taskRequest, @PathVariable int id) throws ParseException {
         Task task = getTaskById(id);
         if(task != null)
@@ -124,5 +121,17 @@ public class TaskController {
        task.setParenttaskid(taskRequest.parenttaskid());
         Task savedTask = taskService.saveTask(task);
         return ResponseEntity.ok(savedTask);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity deleteTask(@PathVariable int id) {
+        Task task = taskService.getTaskById(id).orElse(null);
+        if(task != null)
+        {
+            taskService.deleteTask(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+
     }
 }

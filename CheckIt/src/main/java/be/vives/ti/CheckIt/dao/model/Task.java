@@ -47,7 +47,7 @@ public class Task {
     @JoinColumn(name="priorityid")
     private Priority priority;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name="parenttaskid")
     private List<Task> childtasks;
 }
