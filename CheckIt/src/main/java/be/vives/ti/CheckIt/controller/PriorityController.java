@@ -28,4 +28,9 @@ public class PriorityController {
     public List<Priority> getAllPrioritySorted() {
         return priorityService.getAllPrioritySorted();
     }
+
+    @PostMapping("/standard/{id}")
+    public List<Priority> setStandardPriority(@PathVariable int id) {
+        return priorityService.setStandardPriority(id);
+    }
 }

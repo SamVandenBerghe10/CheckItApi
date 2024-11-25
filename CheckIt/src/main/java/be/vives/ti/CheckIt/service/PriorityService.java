@@ -16,7 +16,7 @@ public class PriorityService {
     private PriorityRepository priorityRepository;
 
     public List<Priority> getAllPriorities() {
-        return priorityRepository.findAll();
+        return priorityRepository.findAllByOrderBySequenceAsc();
     }
 
     public Optional<Priority> getPriorityById(int id) {
@@ -33,5 +33,17 @@ public class PriorityService {
 
     public List<Priority> getAllPrioritySorted() {
         return priorityRepository.findAll(Sort.by(Sort.Order.desc("standardpriority"), Sort.Order.asc("sequence")));
+    }
+
+    public List<Priority> setStandardPriority(int id)
+    {
+        Priority standardPriority = findByStandardpriorityIsTrue().getFirst();
+        standardPriority.setStandardpriority(false);
+        priorityRepository.save(standardPriority);
+
+        Priority newStandard = getPriorityById(id).orElseThrow(() -> new RuntimeException("Category not found"));
+        newStandard.setStandardpriority(true);
+        priorityRepository.save(newStandard);
+        return priorityRepository.findAllByOrderBySequenceAsc();
     }
 }

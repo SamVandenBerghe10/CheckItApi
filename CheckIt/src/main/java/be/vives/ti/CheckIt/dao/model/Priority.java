@@ -24,8 +24,8 @@ public class Priority {
     private String description;
 
     @Column(name="sequence")
-    private String sequence;
+    private Integer sequence;
 
     @Column(name="standardpriority", nullable=false)
-    private String standardpriority;
+    private boolean standardpriority;
 }
