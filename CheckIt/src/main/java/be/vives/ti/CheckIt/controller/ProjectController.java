@@ -2,7 +2,9 @@ package be.vives.ti.CheckIt.controller;
 
 import be.vives.ti.CheckIt.controller.request.ProjectRequest;
 import be.vives.ti.CheckIt.dao.model.Project;
+import be.vives.ti.CheckIt.dao.model.Task;
 import be.vives.ti.CheckIt.service.ProjectService;
+import be.vives.ti.CheckIt.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,9 @@ public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private TaskService taskService;
 
     @GetMapping
     public List<Project> getAllProjects() {
@@ -34,5 +39,19 @@ public class ProjectController {
         project.setDescription(projectRequest.description());
         Project savedProject = projectService.saveProject(project);
         return ResponseEntity.ok(savedProject);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity deleteProject(@PathVariable int id) {
+        List<Task> taskList = taskService.getTaskByProjectId((long)id);
+        for (Task task : taskList) {
+            taskService.deleteTask(Math.toIntExact(task.getId()));
+        }
+        Project deleteProject = projectService.getProjectById(id).orElse(null);
+        if(deleteProject != null) {
+            projectService.deleteProject(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
