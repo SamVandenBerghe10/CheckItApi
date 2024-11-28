@@ -3,6 +3,7 @@ package be.vives.ti.CheckIt.service;
 import be.vives.ti.CheckIt.dao.PriorityRepository;
 import be.vives.ti.CheckIt.dao.model.Priority;
 import be.vives.ti.CheckIt.dao.model.Task;
+import be.vives.ti.CheckIt.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -35,15 +36,14 @@ public class PriorityService {
         return priorityRepository.findAll(Sort.by(Sort.Order.desc("standardpriority"), Sort.Order.asc("sequence")));
     }
 
-    public List<Priority> setStandardPriority(int id)
+    public Priority setStandardPriority(int id)
     {
         Priority standardPriority = findByStandardpriorityIsTrue().getFirst();
         standardPriority.setStandardpriority(false);
         priorityRepository.save(standardPriority);
 
-        Priority newStandard = getPriorityById(id).orElseThrow(() -> new RuntimeException("Category not found"));
+        Priority newStandard = getPriorityById(id).orElseThrow(() -> new ResourceNotFoundException("Priority: " + id));
         newStandard.setStandardpriority(true);
-        priorityRepository.save(newStandard);
-        return priorityRepository.findAllByOrderBySequenceAsc();
+        return priorityRepository.save(newStandard);
     }
 }

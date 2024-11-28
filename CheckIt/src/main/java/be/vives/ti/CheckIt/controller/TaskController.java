@@ -6,6 +6,8 @@ import be.vives.ti.CheckIt.dao.model.Priority;
 import be.vives.ti.CheckIt.dao.model.Project;
 import be.vives.ti.CheckIt.dao.model.Task;
 import be.vives.ti.CheckIt.dto.response.TaskResponse;
+import be.vives.ti.CheckIt.exception.DeadlineParseException;
+import be.vives.ti.CheckIt.exception.ResourceNotFoundException;
 import be.vives.ti.CheckIt.service.CategoryService;
 import be.vives.ti.CheckIt.service.PriorityService;
 import be.vives.ti.CheckIt.service.ProjectService;
@@ -63,8 +65,8 @@ public class TaskController {
 
     @GetMapping("/{id}")
     public TaskResponse getTaskById(@PathVariable int id) {
-        Task task = taskService.getTaskById(id).orElseThrow();
-        TaskResponse taskResponse = new TaskResponse(
+        Task task = taskService.getTaskById(id).orElseThrow(()-> new ResourceNotFoundException("Task: "+id)) ;
+        return new TaskResponse(
                 task.getId(),
                 task.getTitle(),
                 task.getDescription(),
@@ -76,7 +78,6 @@ public class TaskController {
                 task.getPriority(),
                 task.getChildtasks()
         );
-        return taskResponse;
     }
 
     @GetMapping("/project/{id}")
@@ -122,25 +123,29 @@ public class TaskController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Object> createTask(@Valid @RequestBody TaskRequest taskRequest) throws ParseException {
+    public ResponseEntity<Object> createTask(@Valid @RequestBody TaskRequest taskRequest) {
         Task task = new Task();
         task.setTitle(taskRequest.title());
         task.setDescription(taskRequest.description());
-        task.setDeadline(new Timestamp(dateFormat.parse(taskRequest.deadline()).getTime()));
+        try {
+            task.setDeadline(new Timestamp(dateFormat.parse(taskRequest.deadline()).getTime()));
+        } catch (ParseException e) {
+            throw new DeadlineParseException(taskRequest.deadline());
+        }
         task.setStatus(taskRequest.status());
         if (taskRequest.categoryid() != null) {
-            Category category = categoryService.getCategoryById(taskRequest.categoryid()) // Service or repository call
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            Category category = categoryService.getCategoryById(taskRequest.categoryid())
+                    .orElseThrow(()-> new ResourceNotFoundException("Category: "+taskRequest.categoryid()));
             task.setCategory(category);
         }
         if (taskRequest.projectid() != null) {
             Project project = projectService.getProjectById(taskRequest.projectid())
-                    .orElseThrow(() -> new RuntimeException("Project not found"));
+                    .orElseThrow(()-> new ResourceNotFoundException("Project: "+taskRequest.projectid()));
             task.setProject(project);
         }
         if (taskRequest.priorityid() != null) {
             Priority priority = priorityService.getPriorityById(taskRequest.priorityid())
-                    .orElseThrow(() -> new RuntimeException("Priority not found"));
+                    .orElseThrow(()-> new ResourceNotFoundException("Priority: "+taskRequest.priorityid()));
             task.setPriority(priority);
         }
         task.setParenttaskid(taskRequest.parenttaskid());
@@ -154,17 +159,21 @@ public class TaskController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<TaskResponse> updateTask(@Valid @RequestBody TaskRequest taskRequest, @PathVariable int id) throws ParseException {
-        Task task = taskService.getTaskById(id).orElseThrow();
+    public ResponseEntity<TaskResponse> updateTask(@Valid @RequestBody TaskRequest taskRequest, @PathVariable int id) {
+        Task task = taskService.getTaskById(id).orElseThrow(()-> new ResourceNotFoundException("Task: "+id));
 
         task.setId((long)id);
         task.setTitle(taskRequest.title());
         task.setDescription(taskRequest.description());
-        task.setDeadline(new Timestamp(dateFormat.parse(taskRequest.deadline()).getTime()));
+        try{
+            task.setDeadline(new Timestamp(dateFormat.parse(taskRequest.deadline()).getTime()));
+        } catch (ParseException e) {
+            throw new DeadlineParseException(taskRequest.deadline());
+        }
         task.setStatus(taskRequest.status());
         if (taskRequest.categoryid() != null) {
             Category category = categoryService.getCategoryById(taskRequest.categoryid())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
+                    .orElseThrow(()-> new ResourceNotFoundException("Category: "+taskRequest.categoryid()));
             task.setCategory(category);
         }
         else
@@ -173,18 +182,17 @@ public class TaskController {
         }
         if (taskRequest.projectid() != null) {
             Project project = projectService.getProjectById(taskRequest.projectid())
-                    .orElseThrow(() -> new RuntimeException("Project not found"));
+                    .orElseThrow(()-> new ResourceNotFoundException("Project: "+taskRequest.projectid()));
             task.setProject(project);
         }
         if (taskRequest.priorityid() != null) {
             Priority priority = priorityService.getPriorityById(taskRequest.priorityid())
-                    .orElseThrow(() -> new RuntimeException("Priority not found"));
+                    .orElseThrow(()-> new ResourceNotFoundException("Priority: "+taskRequest.priorityid()));
             task.setPriority(priority);
         }
         task.setParenttaskid(taskRequest.parenttaskid());
 
         Task updatedTask = taskService.saveTask(task);
-
         TaskResponse taskResponse = new TaskResponse(
                 updatedTask.getId(),
                 updatedTask.getTitle(),
@@ -197,13 +205,13 @@ public class TaskController {
                 updatedTask.getPriority(),
                 updatedTask.getChildtasks()
         );
-
         return ResponseEntity.ok(taskResponse);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/delete/{id}")
     public void deleteTask(@PathVariable int id) {
+        taskService.getTaskById(id).orElseThrow(()-> new ResourceNotFoundException("Task: "+id));
         try {
             taskService.deleteTask(id);
         } catch (EmptyResultDataAccessException e) {

@@ -1,9 +1,7 @@
 package be.vives.ti.CheckIt.dto.request;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
-
-import java.sql.Timestamp;
+import jakarta.validation.constraints.Null;
 
 public record TaskRequest(
 
@@ -11,6 +9,7 @@ public record TaskRequest(
         String title,
         @Size(max=255)
         String description,
+        @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$")
         String deadline,
         @NotBlank @Size(max=255)
         String status,
