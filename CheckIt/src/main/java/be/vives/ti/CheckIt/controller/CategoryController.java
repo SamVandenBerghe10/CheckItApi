@@ -1,6 +1,6 @@
 package be.vives.ti.CheckIt.controller;
 
-import be.vives.ti.CheckIt.controller.request.CategoryRequest;
+import be.vives.ti.CheckIt.dto.request.CategoryRequest;
 import be.vives.ti.CheckIt.dao.model.Category;
 import be.vives.ti.CheckIt.dao.model.Task;
 import be.vives.ti.CheckIt.service.CategoryService;

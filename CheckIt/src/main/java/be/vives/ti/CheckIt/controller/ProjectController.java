@@ -1,6 +1,6 @@
 package be.vives.ti.CheckIt.controller;
 
-import be.vives.ti.CheckIt.controller.request.ProjectRequest;
+import be.vives.ti.CheckIt.dto.request.ProjectRequest;
 import be.vives.ti.CheckIt.dao.model.Project;
 import be.vives.ti.CheckIt.dao.model.Task;
 import be.vives.ti.CheckIt.service.ProjectService;
