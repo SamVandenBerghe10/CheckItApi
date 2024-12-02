@@ -5,5 +5,5 @@ public record PriorityResponse(
         String name,
         String description,
         Integer sequence,
-        Boolean standardPriority
+        Boolean standardpriority
 ) { }
