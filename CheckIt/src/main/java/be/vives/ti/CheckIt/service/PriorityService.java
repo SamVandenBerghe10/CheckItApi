@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -28,22 +29,26 @@ public class PriorityService {
         return priorityRepository.findByStandardpriorityIsTrue();
     }
 
-    public List<Priority> findByStandardpriorityIsFalse() {
-        return priorityRepository.findByStandardpriorityIsFalse();
-    }
-
     public List<Priority> getAllPrioritySorted() {
         return priorityRepository.findAll(Sort.by(Sort.Order.desc("standardpriority"), Sort.Order.asc("sequence")));
     }
 
     public Priority setStandardPriority(int id)
     {
-        Priority standardPriority = findByStandardpriorityIsTrue().getFirst();
-        standardPriority.setStandardpriority(false);
-        priorityRepository.save(standardPriority);
+        try {
+            List<Priority> standardPriority = findByStandardpriorityIsTrue();
+            for(Priority p : standardPriority){
+                p.setStandardpriority(false);
+                priorityRepository.save(p);
+            }
+        } catch (NoSuchElementException e) {}
 
         Priority newStandard = getPriorityById(id).orElseThrow(() -> new ResourceNotFoundException("Priority: " + id));
         newStandard.setStandardpriority(true);
         return priorityRepository.save(newStandard);
+    }
+
+    public Priority save(Priority priority) {
+        return priorityRepository.save(priority);
     }
 }

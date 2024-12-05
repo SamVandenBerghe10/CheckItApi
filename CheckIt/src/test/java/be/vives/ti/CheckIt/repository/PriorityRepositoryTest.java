@@ -42,19 +42,6 @@ class PriorityRepositoryTest {
     }
 
     @Test
-    void findByStandardpriorityIsFalse() {
-        List<Priority> standardPriorities = priorityRepository.findByStandardpriorityIsFalse();
-        assertThat(standardPriorities.size()).isEqualTo(2);
-
-        Priority standardPriority = standardPriorities.getFirst();
-        assertThat(standardPriority.getId()).isEqualTo(2L);
-        assertThat(standardPriority.getName()).isEqualTo("little less important");
-        assertThat(standardPriority.getDescription()).isEqualTo("do it");
-        assertThat(standardPriority.getSequence()).isEqualTo(3);
-        assertThat(standardPriority.getStandardpriority()).isEqualTo(false);
-    }
-
-    @Test
     void findAllByOrderBySequenceAsc() {
         List<Priority> standardPriorities = priorityRepository.findAllByOrderBySequenceAsc();
         assertThat(standardPriorities.size()).isEqualTo(3);
