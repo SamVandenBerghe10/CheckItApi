@@ -69,7 +69,7 @@ public class TaskRepositoryTest {
 
     @Test
     void findByProjectId() {
-        List<Task> tasks = taskRepository.findByProjectId(1L);
+        List<Task> tasks = taskRepository.findByProjectIdAndParenttaskidIsNull(1L);
         assertThat(tasks.size()).isEqualTo(2);
 
         Task task = tasks.getFirst();
@@ -83,7 +83,7 @@ public class TaskRepositoryTest {
 
     @Test
     void findByCategoryId() {
-        List<Task> tasks = taskRepository.findByCategoryId(1L);
+        List<Task> tasks = taskRepository.findByCategoryIdAndParenttaskidIsNull(1L);
         assertThat(tasks.size()).isEqualTo(2);
 
         Task task = tasks.getFirst();

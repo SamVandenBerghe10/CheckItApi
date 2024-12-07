@@ -83,6 +83,8 @@ public class TaskController {
     @GetMapping("/project/{id}")
     public List<TaskResponse> getTaskByProjectId(@PathVariable Integer id) {
         List<TaskResponse> taskResponses = new ArrayList<>();
+        projectService.getProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project: "+id));
+
         for(Task task : taskService.getTaskByProjectId((long) id)) {
             TaskResponse taskResponse = new TaskResponse(
                     task.getId(),

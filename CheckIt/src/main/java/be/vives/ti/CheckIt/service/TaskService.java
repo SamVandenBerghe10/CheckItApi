@@ -22,11 +22,11 @@ public class TaskService {
     }
 
     public List<Task> getTaskByProjectId(Long projectId) {
-        return taskRepository.findByProjectId(projectId);
+        return taskRepository.findByProjectIdAndParenttaskidIsNull(projectId);
     }
 
     public List<Task> getTaskByCategoryId(Long projectId) {
-        return taskRepository.findByCategoryId(projectId);
+        return taskRepository.findByCategoryIdAndParenttaskidIsNull(projectId);
     }
 
     public Task saveTask(Task task) {
