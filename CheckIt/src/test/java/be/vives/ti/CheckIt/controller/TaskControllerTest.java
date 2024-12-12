@@ -140,7 +140,7 @@ public class TaskControllerTest {
     void getTaskByIdNotFound() throws Exception {
         int taskId = 5;
 
-        when(projectService.getProjectById(taskId)).thenReturn(Optional.empty());
+        when(taskService.getTaskById(taskId)).thenReturn(Optional.empty());
 
         mvc.perform(get(baseUrl + "/" + taskId))
                 .andDo(print())
@@ -149,8 +149,9 @@ public class TaskControllerTest {
 
     @Test
     void getTaskByProjectId() throws Exception {
-        Long projectId = 2L;
+        Long projectId = 1L;
 
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(school));
         when(taskService.getTaskByProjectId(projectId)).thenReturn(Arrays.asList(javaBackend, crossPlatformDevelopment));
 
         mvc.perform(get(baseUrl + "/project/" + projectId))
@@ -167,6 +168,7 @@ public class TaskControllerTest {
     void getTaskByProjectIdNotFound() throws Exception {
         Long projectId = 5L;
 
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.empty());
         when(taskService.getTaskByProjectId(projectId)).thenReturn(List.of());
 
         mvc.perform(get(baseUrl + "/project/" + projectId))
@@ -178,6 +180,7 @@ public class TaskControllerTest {
     void getTaskByCategoryId() throws Exception {
         Long categoryId = 1L;
 
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(it));
         when(taskService.getTaskByCategoryId(categoryId)).thenReturn(Arrays.asList(javaBackend, crossPlatformDevelopment));
 
         mvc.perform(get(baseUrl + "/category/" + categoryId))
@@ -188,6 +191,20 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$[0].id", is(Math.toIntExact(javaBackend.getId()))))
                 .andExpect(jsonPath("$[0].childtasks[0].id", is(Math.toIntExact(deployApi.getId()))))
                 .andExpect(jsonPath("$[1].id", is(Math.toIntExact(crossPlatformDevelopment.getId()))));
+    }
+
+    @Test
+    void getTaskByCategoryIdHas0() throws Exception {
+        Long categoryId = 5L;
+
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.empty());
+        when(taskService.getTaskByCategoryId(categoryId)).thenReturn(List.of());
+
+        mvc.perform(get(baseUrl + "/category/" + categoryId))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
@@ -208,10 +225,10 @@ public class TaskControllerTest {
         iosStuderen.setPriority(highpriority);
         iosStuderen.setChildtasks(null);
 
-        when(taskService.saveTask(any(Task.class))).thenReturn(iosStuderen);
         when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(school));
         when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(it));
         when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.of(highpriority));
+        when(taskService.saveTask(any(Task.class))).thenReturn(iosStuderen);
 
         TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
 
@@ -222,4 +239,325 @@ public class TaskControllerTest {
                             .andExpect(header().string("location", "http://localhost/tasks/add/6"));
     }
 
+    @Test
+    void createTaskProjectNotFound() throws Exception {
+        Long projectId = 5L;
+        Long categoryId = 1L;
+        Long priorityId = 1L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(6L);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.empty());
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(it));
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.of(highpriority));
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(post(baseUrl + "/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createTaskCategoryNotFound() throws Exception {
+        Long projectId = 1L;
+        Long categoryId = 5L;
+        Long priorityId = 1L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(6L);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(school));
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.empty());
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.of(highpriority));
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(post(baseUrl + "/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createTaskPriorityNotFound() throws Exception {
+        Long projectId = 1L;
+        Long categoryId = 1L;
+        Long priorityId = 5L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(6L);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(school));
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(it));
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.empty());
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(post(baseUrl + "/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateTask() throws Exception {
+        Long projectId = 1L;
+        Long categoryId = 1L;
+        Long priorityId = 1L;
+
+        Long taskId = 6L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(taskId);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(taskService.getTaskById(Math.toIntExact(taskId))).thenReturn(Optional.of(iosStuderen));
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(school));
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(it));
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.of(highpriority));
+        when(taskService.saveTask(any(Task.class))).thenReturn(iosStuderen);
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(put(baseUrl + "/update/" + taskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(6L));
+    }
+
+    @Test
+    void updateTaskNotFound() throws Exception {
+        Long projectId = 1L;
+        Long categoryId = 1L;
+        Long priorityId = 1L;
+
+        Long taskId = 6L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(taskId);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(taskService.getTaskById(Math.toIntExact(taskId))).thenReturn(Optional.empty());
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(school));
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(it));
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.of(highpriority));
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(put(baseUrl + "/update/" + taskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateTaskProjectNotFound() throws Exception {
+        Long projectId = 5L;
+        Long categoryId = 1L;
+        Long priorityId = 1L;
+
+        Long taskId = 6L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(taskId);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(taskService.getTaskById(Math.toIntExact(taskId))).thenReturn(Optional.of(iosStuderen));
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.empty());
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(it));
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.of(highpriority));
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(put(baseUrl + "/update/" + taskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateTaskCategoryNotFound() throws Exception {
+        Long projectId = 1L;
+        Long categoryId = 5L;
+        Long priorityId = 1L;
+
+        Long taskId = 6L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(taskId);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(taskService.getTaskById(Math.toIntExact(taskId))).thenReturn(Optional.of(iosStuderen));
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(school));
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.empty());
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.of(highpriority));
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(put(baseUrl + "/update/" + taskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateTaskPriorityNotFound() throws Exception {
+        Long projectId = 1L;
+        Long categoryId = 1L;
+        Long priorityId = 5L;
+
+        Long taskId = 6L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(taskId);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(taskService.getTaskById(Math.toIntExact(taskId))).thenReturn(Optional.of(iosStuderen));
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(school));
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(it));
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.empty());
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22 12:00:00", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(put(baseUrl + "/update/" + taskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateTaskValidationError() throws Exception {
+        Long taskId = 6L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(taskId);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+
+        TaskRequest iosStuderenRequest = new TaskRequest(iosStuderen.getTitle(), iosStuderen.getDescription(), "2024-12-22", iosStuderen.getStatus(), 1, 1, 1, null);
+
+        mvc.perform(put(baseUrl + "/update/" + taskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iosStuderenRequest))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deleteTask() throws Exception {
+        Long taskId = 6L;
+
+        Task iosStuderen = new Task();
+        iosStuderen.setId(taskId);
+        iosStuderen.setTitle("ios examen studeren");
+        iosStuderen.setDescription("veel werk");
+        iosStuderen.setDeadline(timestamp);
+        iosStuderen.setStatus("To Do");
+        iosStuderen.setParenttaskid(null);
+        iosStuderen.setProject(school);
+        iosStuderen.setCategory(it);
+        iosStuderen.setPriority(highpriority);
+        iosStuderen.setChildtasks(null);
+
+        when(taskService.getTaskById(Math.toIntExact(taskId))).thenReturn(Optional.of(iosStuderen));
+
+        mvc.perform(delete(baseUrl + "/delete/" + taskId))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteTaskNotFound() throws Exception {
+        Long taskId = 6L;
+
+        when(taskService.getTaskById(Math.toIntExact(taskId))).thenReturn(Optional.empty());
+
+        mvc.perform(delete(baseUrl + "/delete/" + taskId))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }
