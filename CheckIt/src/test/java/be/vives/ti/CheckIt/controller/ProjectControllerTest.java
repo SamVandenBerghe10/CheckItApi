@@ -117,5 +117,28 @@ public class ProjectControllerTest {
                 .andExpect(status().isBadRequest());
 
     }
-    //TODO test delete project
+
+
+    @Test
+    void deleteProject() throws Exception {
+        Long projectId = 6L;
+
+        Project sports = new Project(projectId, "Sports", "stay healthy");
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.of(sports));
+
+        mvc.perform(delete(baseUrl + "/delete/" + projectId))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteProjectNotFound() throws Exception {
+        Long projectId = 6L;
+
+        when(projectService.getProjectById(Math.toIntExact(projectId))).thenReturn(Optional.empty());
+
+        mvc.perform(delete(baseUrl + "/delete/" + projectId))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }

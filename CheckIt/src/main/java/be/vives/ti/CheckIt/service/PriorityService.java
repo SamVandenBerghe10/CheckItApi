@@ -35,6 +35,10 @@ public class PriorityService {
 
     public Priority setStandardPriority(int id)
     {
+        Priority newStandard = getPriorityById(id).orElseThrow(() -> new ResourceNotFoundException("Priority: " + id));
+        if(newStandard == null){
+            return null;
+        }
         try {
             List<Priority> standardPriority = findByStandardpriorityIsTrue();
             for(Priority p : standardPriority){
@@ -43,7 +47,6 @@ public class PriorityService {
             }
         } catch (NoSuchElementException e) {}
 
-        Priority newStandard = getPriorityById(id).orElseThrow(() -> new ResourceNotFoundException("Priority: " + id));
         newStandard.setStandardpriority(true);
         return priorityRepository.save(newStandard);
     }

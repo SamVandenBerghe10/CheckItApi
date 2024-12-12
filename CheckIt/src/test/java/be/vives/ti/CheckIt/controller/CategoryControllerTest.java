@@ -114,5 +114,28 @@ public class CategoryControllerTest {
                         .content(objectMapper.writeValueAsString(bakingRequest)))
                 .andExpect(status().isBadRequest());
     }
-    //TODO test delete category
+
+    @Test
+    void deleteCategory() throws Exception {
+        Long categoryId = 5L;
+
+        Category category = new Category(categoryId, "skydiving", "falling from the sky", "gray");
+
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.of(category));
+
+        mvc.perform(delete(baseUrl + "/delete/" + categoryId))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteCategoryNotFound() throws Exception {
+        Long categoryId = 5L;
+
+        when(categoryService.getCategoryById(Math.toIntExact(categoryId))).thenReturn(Optional.empty());
+
+        mvc.perform(delete(baseUrl + "/delete/" + categoryId))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }

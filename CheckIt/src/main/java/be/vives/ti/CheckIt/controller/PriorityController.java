@@ -65,6 +65,9 @@ public class PriorityController {
     @PutMapping("/standard/{id}")
     public ResponseEntity<PriorityResponse> setStandardPriority(@PathVariable int id) {
         Priority priority = priorityService.setStandardPriority(id);
+        if(priority == null) {
+            throw new ResourceNotFoundException("Priority: " + id);
+        }
         PriorityResponse priorityResponse = new PriorityResponse(
                 priority.getId(),
                 priority.getName(),

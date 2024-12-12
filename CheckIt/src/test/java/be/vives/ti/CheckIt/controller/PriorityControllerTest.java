@@ -1,7 +1,9 @@
 package be.vives.ti.CheckIt.controller;
 
+import be.vives.ti.CheckIt.dao.PriorityRepository;
 import be.vives.ti.CheckIt.dao.model.Priority;
 import be.vives.ti.CheckIt.dao.model.Project;
+import be.vives.ti.CheckIt.dto.request.PriorityRequest;
 import be.vives.ti.CheckIt.dto.request.ProjectRequest;
 import be.vives.ti.CheckIt.service.PriorityService;
 import be.vives.ti.CheckIt.service.ProjectService;
@@ -35,6 +37,9 @@ public class PriorityControllerTest {
 
     @MockBean
     private TaskService taskService;
+
+    @MockBean
+    private PriorityRepository priorityRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -107,5 +112,27 @@ public class PriorityControllerTest {
                 .andExpect(jsonPath("$[2].id", is(Math.toIntExact(lowImportant.getId()))));
     }
 
-    //TODO setStandardPriority: PUT
+    @Test
+    void setStandardPriority() throws Exception {
+        Long priorityId = 5L;
+
+        Priority priority = new Priority(priorityId, "lowest priority", "dont do this", 5, true);
+
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.of(priority));
+        when(priorityService.setStandardPriority(Math.toIntExact(priorityId))).thenReturn(priority);
+
+        mvc.perform(put(baseUrl + "/standard/" + priorityId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(Math.toIntExact(priority.getId()))));
+    }
+
+    @Test
+    void setStandardPriorityNotFound() throws Exception {
+        Long priorityId = 5L;
+
+        when(priorityService.getPriorityById(Math.toIntExact(priorityId))).thenReturn(Optional.empty());
+
+        mvc.perform(put(baseUrl + "/standard/" + priorityId))
+                .andExpect(status().isNotFound());
+    }
 }
