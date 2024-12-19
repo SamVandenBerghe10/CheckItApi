@@ -68,22 +68,32 @@ public class TaskRepositoryTest {
     }
 
     @Test
-    void findByProjectId() {
+    void findByProjectIdAndParenttaskidIsNull() {
         List<Task> tasks = taskRepository.findByProjectIdAndParenttaskidIsNull(1L);
-        assertThat(tasks.size()).isEqualTo(2);
+        assertThat(tasks.size()).isEqualTo(1);
 
         Task task = tasks.getFirst();
         assertThat(task.getId()).isEqualTo(1L);
         assertThat(task.getProject().getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void findByCategoryIdAndParenttaskidIsNull() {
+        List<Task> tasks = taskRepository.findByCategoryIdAndParenttaskidIsNull(1L);
+        assertThat(tasks.size()).isEqualTo(2);
+
+        Task task = tasks.getFirst();
+        assertThat(task.getId()).isEqualTo(1L);
+        assertThat(task.getCategory().getId()).isEqualTo(1L);
 
         Task task2 = tasks.getLast();
-        assertThat(task2.getId()).isEqualTo(2L);
-        assertThat(task2.getProject().getId()).isEqualTo(1L);
+        assertThat(task2.getId()).isEqualTo(3L);
+        assertThat(task2.getCategory().getId()).isEqualTo(1L);
     }
 
     @Test
     void findByCategoryId() {
-        List<Task> tasks = taskRepository.findByCategoryIdAndParenttaskidIsNull(1L);
+        List<Task> tasks = taskRepository.findByCategoryId(1L);
         assertThat(tasks.size()).isEqualTo(2);
 
         Task task = tasks.getFirst();

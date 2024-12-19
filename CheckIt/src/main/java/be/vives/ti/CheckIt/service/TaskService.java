@@ -29,6 +29,10 @@ public class TaskService {
         return taskRepository.findByCategoryIdAndParenttaskidIsNull(projectId);
     }
 
+    public List<Task> getTaskByCategoryIdWithChildren(Long projectId) {
+        return taskRepository.findByCategoryId(projectId);
+    }
+
     public Task saveTask(Task task) {
         return taskRepository.save(task);
     }

@@ -74,7 +74,7 @@ public class CategoryController {
     public void deleteCategory(@PathVariable int id) {
         categoryService.getCategoryById(id).orElseThrow(() -> new ResourceNotFoundException("Category: "+ id));
         try {
-            List<Task> taskList = taskService.getTaskByCategoryId((long)id);
+            List<Task> taskList = taskService.getTaskByCategoryIdWithChildren((long)id);
             for (Task task : taskList) {
                 task.setCategory(null);
                 taskService.saveTask(task);
