@@ -3,6 +3,8 @@
 een java spring boot 3 api gemaakt voor het vak: Java Backend,
 Vives Hogeschool Kortrijk
 
+https://checkit-444817.ew.r.appspot.com/
+
 Door Sam Vanden Berghe
 - sam.vanden.berghe@icloud.com (privé)
 - sam.vandenberghe@student.vives.be(school)
@@ -13,7 +15,7 @@ Ik heb gekozen voor een postgresql database, deze is gehost op [Supabase](https:
 
 In de database zitten 4 entiteiten: Project, Category, Priority, Task
 
-!["domein model"](Checkit.jpg)
+!["domein model"](CheckIt.jpg)
 
 ### Project (Table/class):
 - (PK) id: Int8
