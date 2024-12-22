@@ -13,6 +13,6 @@ public class HomeController {
 
     @GetMapping
     public String welcome() {
-        return "<h1>CheckIt api!</h1>";
+        return "<h1>CheckIt api!</h1><a href='https://checkit-444817.ew.r.appspot.com/swagger-ui/index.html'>Swagger docs</a>";
     }
 }
