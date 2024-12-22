@@ -3,11 +3,17 @@
 een java spring boot 3 api gemaakt voor het vak: Java Backend,
 Vives Hogeschool Kortrijk
 
+Door Sam Vanden Berghe
+- sam.vanden.berghe@icloud.com (privé)
+- sam.vandenberghe@student.vives.be(school)
+
 ## Domeinmodel database
 
-Ik heb gekozen voor een postgresql database, deze is gehost op Supabase
+Ik heb gekozen voor een postgresql database, deze is gehost op [Supabase](https://supabase.com/)
 
 In de database zitten 4 entiteiten: Project, Category, Priority, Task
+
+!["domein model"](Checkit.jpg)
 
 ### Project (Table/class):
 - (PK) id: Int8
@@ -52,11 +58,15 @@ In de database zitten 4 entiteiten: Project, Category, Priority, Task
   - (een priority kan bij 0 of meer taken behoren, een task moet 1 priority hebben)
 
 ## Swagger
-//verrander wanneer in cloud
 
-[CheckIt Swagger](http://localhost:8080/swagger-ui/index.html#/)
+[CheckIt Swagger](https://checkit-444817.ew.r.appspot.com/swagger-ui/index.html)
 
 ## EndPoints
+
+### /
+
+Geen api, simpele 'begin' pagina
+- met url naar Swagger-overzicht
 
 ### Project
 
@@ -98,6 +108,11 @@ bevat volledige crud
 - DELETE /tasks/delete/{id}
 
 
+## Profiles
+
+- Active (default): zal verbinding maken met de productiedatabase
+- Test: zal verbinding maken met de database die gebruikt wordt voor de testklassen
+- Release: zal verbinding maken met de database die gebruikt wordt bij het ontwikkelen
 
 
 ## githubclassroom
